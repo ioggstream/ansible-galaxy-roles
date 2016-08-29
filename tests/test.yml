@@ -1,5 +1,8 @@
 ---
-- hosts: localhost
-  remote_user: root
+- hosts: all
+
+  # This is a placeholder for the current role, which is mapped into 
+  #  /etc/ansible/roles/
   roles:
-    - debug
+    - role_under_test
+
