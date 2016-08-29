@@ -1,29 +1,29 @@
 ---
-language: python
-python: "2.7"
+sudo: required
+env:
+  #matrix:
+  - OS_TYPE=centos OS_VERSION=6 ANSIBLE_VERSION=1.9.2
 
-# Use the new container infrastructure
-sudo: false
+branches:
+  only:
+  - master
+#  - stable
 
-# Install ansible
-addons:
-  apt:
-    packages:
-    - python-pip
+services:
+  - docker
 
-install:
-  # Install ansible
-  - pip install ansible
-
-  # Check ansible version
-  - ansible --version
-
-  # Create ansible.cfg with correct roles_path
-  - printf '[defaults]\nroles_path=../' >ansible.cfg
+before_install:
+  - sudo apt-get update
+  - sudo apt-get upgrade lxc-docker
+  - echo 'DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -s devicemapper"' | sudo tee /etc/default/docker > /dev/null
+  - sudo service docker restart
+  - sleep 5
+  - sudo docker pull weldpua2008/docker-ansible:${OS_TYPE}${OS_VERSION}_v${ANSIBLE_VERSION}
 
 script:
-  # Basic role syntax check
-  - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+ # Run tests in Container
+ - sudo docker run --rm=true -v `pwd`:/code:rw  --name=test_debug centos:7 /bin/bash -c "/code/tests/test.sh ${OS_TYPE} ${OS_VERSION} ${ANSIBLE_VERSION}"
 
 notifications:
-  webhooks: https://galaxy.ansible.com/api/v1/notifications/
+  email: false
+
