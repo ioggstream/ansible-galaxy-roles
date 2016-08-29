@@ -1,6 +1,7 @@
+---
+# Install Debug and Monitoring packages.
 #
-# Install some debug and benchmarking packages.
-#
+
 - name: Install EPEL
   yum: name=epel-release state=present
 
